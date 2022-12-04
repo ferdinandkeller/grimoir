@@ -1,0 +1,80 @@
+:root {
+    font-size: 10px;
+}
+
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    border: none;
+    outline: none;
+
+    font-family: Poppins, sans-serif;
+    word-spacing: .1em;
+    letter-spacing: .03em;
+    line-height: 1.5em;
+}
+
+body {
+    font-size: 1.6rem;
+    min-width: 100vw;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+editor {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 10rem 3rem;
+
+    h1, p, ulp {
+        margin-bottom: 2em;
+    }
+
+    h1 {
+        span {
+            &.normal {
+                font-weight: 800;
+                font-style: normal;
+            }
+            &.bold {
+                font-weight: 900;
+            }
+            &.italic {
+                font-style: italic;
+            }
+        }
+    }
+    
+    p, ulp {
+        span {
+            &.normal {
+                font-weight: 400;
+                font-style: normal;
+            }
+            &.bold {
+                font-weight: 800;
+            }
+            &.italic {
+                font-style: italic;
+            }
+        }
+    }
+
+    ulp {
+        &::before {
+            content: "•";
+            margin-right: 1em;
+        }
+
+    }
+    ulp + ulp {
+        margin-top: -2em;
+    }
+    
+}
