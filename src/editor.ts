@@ -1,70 +1,74 @@
-// editor
-//  -> component
-//      -> subcomponent
+import { Component } from "./component"
 
-import { SelectionUtils } from "./selection_utils"
-import { Component, ComponentType } from "./component"
-import { Subcomponent, SubcomponentType } from "./subcomponent"
-
+/**
+ * Inner-representation of an editor element.
+ */
 export class Editor {
+    /**
+     * The dom element for the editor.
+     */
     dom_element: Element
-    selection_utils: SelectionUtils
-    
-    constructor(editor_element: Element) {
-        // set the dom element for the editor
-        this.dom_element = editor_element
 
-        // create the selection utils
-        this.selection_utils = new SelectionUtils()
-
-        // register the key press and key release events
-        document.addEventListener('keydown', (event) => {
-            this.key_pressed(event)
-        })
-        document.addEventListener('keyup', (event) => {
-            this.key_released(event)
-        })
-
-        // make the editor editable
-        this.dom_element.setAttribute('contenteditable', 'true')
-        this.dom_element.setAttribute('spellcheck', 'false')
+    /**
+     * Creates a new editor from an existing dom element.
+     * 
+     * @param dom_element The dom element for the editor.
+     */
+    constructor(dom_element: Element) {
+        // save the dom element
+        this.dom_element = dom_element
     }
 
-    key_pressed(event: KeyboardEvent) {
-        // if the user is typing in the editor
-        if (this.is_focused()) {
-            // get the key that was pressed
-            let key = event.key
+    /**
+     * Returns the components inside the editor.
+     */
+    components(): Component[] {
+        return [...this.dom_element.children].map(child => new Component(child))
+    }
 
-            // handle the key press
-            switch (key) {
-                case 'Enter':
-                    event.preventDefault()
-                    this.insert_new_line()
-            }
+    /**
+     * Returns the number of components inside the editor.
+     */
+    get size(): number {
+        return this.dom_element.childElementCount
+    }
+
+    /**
+     * Returns the component at the given index.
+     * 
+     * @param index The index of the component to return.
+     */
+    nth_component(index: number): Component {
+        return new Component(this.dom_element.children[index])
+    }
+
+    /**
+     * Removes all the components before the given index.
+     * 
+     * @param index The index of the component to remove.
+     */
+    remove_before(index: number) {
+        [...this.dom_element.children].slice(0, index).forEach(child => child.remove())
+    }
+
+    /**
+     * Removes all the components after the given index.
+     * 
+     * @param index The index of the component to remove.
+     */
+    remove_from(index: number) {
+        [...this.dom_element.children].slice(index).forEach(child => child.remove())
+    }
+
+    /**
+     * Removes all the components between the given indices.
+     * 
+     * @param start_index The index at which we start to remove.
+     * @param end_index The index at which we stop to remove.
+     */
+    remove_between(start_index: number, end_index: number) {
+        if (start_index <= end_index) {
+            [...this.dom_element.children].slice(start_index, end_index).forEach(child => child.remove())
         }
-    }
-
-    key_released(event: KeyboardEvent) {
-    }
-
-    is_focused(): boolean {
-        return document.activeElement === this.dom_element
-    }
-
-    insert_new_line() {
-        // delete selected text
-
-        // break the current subcomponent into two
-        let caret_subcomponent = this.selection_utils.focus_subcomponent()
-        let caret_offset = this.selection_utils.focus_offset()
-        let new_subcomponent = caret_subcomponent.split(caret_offset)
-        
-        // break the current component into two
-        let subcomponent_index = caret_subcomponent.index
-        caret_subcomponent.component.split(subcomponent_index + 1)
-
-        // move the caret to the new line
-        this.selection_utils.set_caret(new_subcomponent, 0)
     }
 }

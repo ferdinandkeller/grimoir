@@ -32,6 +32,11 @@ editor {
     flex-direction: column;
     padding: 10rem 3rem;
 
+    ::selection {
+        background-color: black;
+        color: white;
+    }
+
     h1, p, ulp {
         margin-bottom: 2em;
     }

@@ -16,14 +16,15 @@ export class Subcomponent {
     /**
      * The dom element for the subcomponent.
      */
-    dom_element: HTMLSpanElement
+    dom_element: Element
 
     /**
      * Creates a new subcomponent from an existing dom element.
      * 
      * @param dom_element The dom element for the subcomponent.
      */
-    constructor(dom_element: HTMLSpanElement) {
+    constructor(dom_element: Element) {
+        // save the dom element
         this.dom_element = dom_element
     }
 
@@ -93,6 +94,17 @@ export class Subcomponent {
     }
 
     /**
+     * Sets the type of the subcomponent.
+     */
+    set type(type: SubcomponentType) {
+        // remove all subcomponent type classes
+        this.dom_element.classList.remove(...this.dom_element.classList)
+
+        // add the appropriate class to the subcomponent
+        this.dom_element.classList.add(type)
+    }
+
+    /**
      * Returns the component containing the subcomponent.
      */
     get component(): Component {
@@ -108,18 +120,48 @@ export class Subcomponent {
         return new Component(component)
     }
 
+    /**
+     * Returns the index of the subcomponent in the component.
+     */
     get index(): number {
-        // get the component
-        let component = this.component
+        // get the component children
+        let children = [...this.component.dom_element.children]
 
-        // get the component subcomponents
-        return component.index_of_subcomponent(this)
+        // get the index of the subcomponent
+        let index = children.indexOf(this.dom_element)
+
+        // if the subcomponent index cannot be found, throw an error
+        if (index === -1) {
+            throw new Error('Could not find the subcomponent index.')
+        }
+
+        // return the index
+        return index
+    }
+
+    /**
+     * Returns the text node of the subcomponent.
+     */
+    get text_node(): Node {
+        // get the text node
+        let text_node = this.dom_element.firstChild
+
+        // if the text node cannot be found, throw an error
+        if (text_node === null) {
+            throw new Error('Could not find the subcomponent text node.')
+        }
+
+        // return the text node
+        return text_node
     }
 
     /**
      * Split the subcomponent in two at the given index.
+     * The current subcomponent will be updated to contain the text before the index.
+     * A new subcomponent will be added after the current subcomponent, containing the text after the index.
      * 
      * @param index The index at which to split the subcomponent.
+     * @returns The new subcomponent.
      */
     split(index: number): Subcomponent {
         // find the subcomponent text
@@ -140,5 +182,58 @@ export class Subcomponent {
 
         // return the new subcomponent
         return new_subcomponent
+    }
+
+    /**
+     * Combines the current subcomponent with the given subcomponent.
+     * The combining only happens if the subcomponents have the same type.
+     * 
+     * @param other The subcomponent to combine with.
+     */
+    combine(other: Subcomponent) {
+        if (this.type === other.type) {
+            // combine the subcomponents text
+            this.text += other.text
+    
+            // remove the other subcomponent
+            other.remove()
+        }
+    }
+
+    /**
+     * Removes the subcomponent from the dom.
+     */
+    remove() {
+        this.dom_element.remove()
+    }
+
+    /**
+     * Removes all the text before the given index.
+     * 
+     * @param index The index before witch to remove the text.
+     */
+    remove_before(index: number) {
+        this.text = this.text.substring(index)
+    }
+
+    /**
+     * Removes all the text after the given index.
+     * 
+     * @param index The index after witch to remove the text.
+     */
+    remove_from(index: number) {
+        this.text = this.text.substring(0, index)
+    }
+
+    /**
+     * Removes the text between the given indices.
+     * 
+     * @param start_index The index at which we start to remove.
+     * @param end_index The index at which we stop to remove.
+     */
+     remove_between(start_index: number, end_index: number) {
+        if (start_index <= end_index) {
+            this.text = this.text.substring(0, start_index) + this.text.substring(end_index)
+        }
     }
 }
